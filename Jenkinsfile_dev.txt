@@ -1,0 +1,24 @@
+node {
+      stage('scm checkout') {
+            git 'https://github.com/Coveros/helloworld.git'
+         }
+      stage('maven build'){
+            sh "mvn -Dskiptests=true clean package"
+      }
+      stage('SonarQube analysis') {
+       withSonarQubeEnv(credentialsId: 'aacc4bfe-efa3-4897-a0f6-0a19a5da9712') {
+       sh 'mvn clean package sonar:sonar ' +
+        '-Dsonar.sonar.projectKey=hello ' +
+        '-Dsonar.sourceEncoding=UTF-8 ' +
+        '-Dsonar.language=java ' +
+        '-Dsonar.sources=src/main '
+       }
+     }
+      stage('nexus artifact uploader'){
+          nexusArtifactUploader artifacts: [[artifactId: 'helloworld', classifier: '', 
+          file: '/var/lib/jenkins/workspace/scripted_pipeline/target/helloworld-1.1.jar', 
+          type: 'jar']], credentialsId: '1a899d4d-824d-4f92-a73d-55df1acb8876', 
+          groupId: 'com.coveros.demo', nexusUrl: 'ec2-3-1-83-39.ap-southeast-1.compute.amazonaws.com:8081/', 
+          nexusVersion: 'nexus3', protocol: 'http', repository: 'nexus-class', version: '1.6'
+        }
+}
