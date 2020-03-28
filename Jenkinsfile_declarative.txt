@@ -3,7 +3,7 @@ pipeline {
    stages {
       stage('code checkout & Build') {
          steps {
-            git 'https://github.com/Coveros/helloworld.git'
+            git 'https://github.com/bharathraju1988/helloworld.git'
             sh "mvn -Dmaven.test.failure.ignore=true clean package"
          }
         }
