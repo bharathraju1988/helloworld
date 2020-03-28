@@ -1,0 +1,20 @@
+pipeline {
+   agent any
+   stages {
+      stage('code checkout & Build') {
+         steps {
+            git 'https://github.com/Coveros/helloworld.git'
+            sh "mvn -Dmaven.test.failure.ignore=true clean package"
+         }
+        }
+         stage('upload Artifact') {
+	      steps {
+       nexusArtifactUploader artifacts: [[artifactId: 'helloworld', classifier: '', 
+       file: '/var/lib/jenkins/workspace/pipeline_demo/target/helloworld-1.1.jar', 
+       type: 'jar']], credentialsId: '1a899d4d-824d-4f92-a73d-55df1acb8876', 
+       groupId: 'com.coveros.demo', nexusUrl: 'ec2-13-229-230-18.ap-southeast-1.compute.amazonaws.com:8081/', 
+       nexusVersion: 'nexus3', protocol: 'http', repository: 'nexus-class', version: '1.11'
+	    }
+      }
+   }
+}
